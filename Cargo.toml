@@ -8,6 +8,6 @@ colored = "2.0.0"
 subprocess = "0.2.8"
 
 [profile.release]
-strip = true
-lto = true
 codegen-units = 1
+lto = true
+strip = true

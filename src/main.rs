@@ -7,14 +7,13 @@ use std::path::PathBuf;
 use subprocess::{Exec, Popen, PopenError, Redirection};
 
 fn main() -> std::io::Result<()> {
-    let dirs = cwd_child_dirs()?;
-    let command = command_from_args();
-    let command = command.trim();
+    let dirs: Vec<DirEntry> = cwd_child_dirs()?;
+    let command: String = command_from_args().trim().to_owned();
 
     let mut processes: Vec<(Popen, PathBuf)> = dirs
         .into_iter()
         .map(|d| d.path())
-        .map(|d| run_command_in_dir(command, &d).map(|x| (x, d)))
+        .map(|d| run_command_in_dir(&command, &d).map(|x| (x, d)))
         .collect::<Result<Vec<(Popen, PathBuf)>>>()?;
 
     let reports: Vec<String> = processes
@@ -65,9 +64,7 @@ fn run_command_in_dir(command: &str, path: &PathBuf) -> Result<Popen> {
 }
 
 fn command_from_args() -> String {
-    args()
-        .skip(1)
-        .fold(String::new(), |acc, s| format!("{} {}", acc, s))
+    args().skip(1).collect::<Vec<String>>().join(" ")
 }
 
 fn cwd_child_dirs() -> std::io::Result<Vec<DirEntry>> {
